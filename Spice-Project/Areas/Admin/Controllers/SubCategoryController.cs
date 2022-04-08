@@ -80,5 +80,132 @@ namespace Spice_Project.Areas.Admin.Controllers
             subCategories = await(from subCategory in _db.SubCategory where subCategory.CategoryId == id select subCategory).ToListAsync();
             return Json(new SelectList(subCategories,"Id","Name"));
         }
+
+        // Get- Edit
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if(id==null)
+            {
+                return NotFound();
+            }
+            var subCategory = await _db.SubCategory.SingleOrDefaultAsync(x => x.Id == id);
+            if (subCategory == null)
+            {
+                return NotFound();
+            }
+            SubCategoryAndCategoryViewModel model = new SubCategoryAndCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = subCategory,
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).Distinct().ToListAsync()
+            };
+            return View(model);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id,SubCategoryAndCategoryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var doesSubCategoryExists = _db.SubCategory.Include(s => s.Category).Where(s => s.Name == model.SubCategory.Name && s.Category.Id == model.SubCategory.CategoryId);
+                if (doesSubCategoryExists.Count() > 0)
+                {
+                    //Error
+                    StatusMessage = "Error : Sub Category exists and under " + doesSubCategoryExists.First().Category.Name + "category. please use another name.";
+
+                }
+                else
+                {
+                    var subCatFromDb = await _db.SubCategory.FindAsync(id);
+                    subCatFromDb.Name = model.SubCategory.Name;
+                    await _db.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            SubCategoryAndCategoryViewModel modelVM = new SubCategoryAndCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = new Models.SubCategory(),
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).ToListAsync(),
+                StatusMessage = StatusMessage
+            };
+            return View(modelVM);
+        }
+
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var subCategory = await _db.SubCategory.SingleOrDefaultAsync(x => x.Id == id);
+            if (subCategory == null)
+            {
+                return NotFound();
+            }
+            SubCategoryAndCategoryViewModel model = new SubCategoryAndCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = subCategory,
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).Distinct().ToListAsync()
+            };
+            return View(model);
+        }
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id, SubCategoryAndCategoryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var doesSubCategoryExists = _db.SubCategory.Include(s => s.Category).Where(s => s.Name == model.SubCategory.Name && s.Category.Id == model.SubCategory.CategoryId);
+                if (doesSubCategoryExists.Count() > 0)
+                {
+                    //Error
+                    StatusMessage = "Error : Sub Category exists and under " + doesSubCategoryExists.First().Category.Name + "category. please use another name.";
+
+                }
+                else
+                {
+                    var subCatFromDb = await _db.SubCategory.FindAsync(id);
+                    _db.SubCategory.Remove(subCatFromDb);
+                    await _db.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            SubCategoryAndCategoryViewModel modelVM = new SubCategoryAndCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = new Models.SubCategory(),
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).ToListAsync(),
+                StatusMessage = StatusMessage
+            };
+            return View(modelVM);
+        }
+
+
+        // Get- Details
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var subCategory = await _db.SubCategory.SingleOrDefaultAsync(x => x.Id == id);
+            if (subCategory == null)
+            {
+                return NotFound();
+            }
+            SubCategoryAndCategoryViewModel model = new SubCategoryAndCategoryViewModel()
+            {
+                CategoryList = await _db.Category.ToListAsync(),
+                SubCategory = subCategory,
+                SubCategoryList = await _db.SubCategory.OrderBy(p => p.Name).Select(p => p.Name).Distinct().ToListAsync()
+            };
+            return View(model);
+        }
+
     }
 }
