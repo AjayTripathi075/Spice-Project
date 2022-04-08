@@ -16,25 +16,26 @@
     <div>
         @if (Model.Count() > 0)
         {
-            <table class="table table-stripped border">
-                <tr class="table-secondary">
-                    <th>@Html.DisplayNameFor(x => x.Name)</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                <tr>
-                    @foreach (var item in Model)
-                    {
-                        <td>@Html.DisplayFor(m => item.Name)</td>
-                        <td>
-                           <partial name="_TableButtonPartial" model="item.Id">
+        <table class="table table-stripped border">
+            <tr class="table-secondary">
+                <th>@Html.DisplayNameFor(x => x.Name)</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
 
-                        </td>
+            @foreach (var item in Model)
+            {
+              <tr>
+                <td>@Html.DisplayFor(m => item.Name)</td>
+                <td>
+                <partial name="_TableButtonPartial" model="item.Id">
 
-                    }
-                </tr>
-            </table> }
+              </td>
+              </tr>
+             }   
+            </table>
+           }
         else
         {
             <p>No Category Exists..</p>
